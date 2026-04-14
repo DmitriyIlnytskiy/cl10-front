@@ -1,16 +1,20 @@
-# flutter_client
+# React-to-Flutter Custom Renderer (PoC)
 
-A new Flutter project.
+This project is a Proof of Concept (PoC) for a custom React renderer utilizing a **two-process architecture**. It demonstrates how to decouple React's reconciliation engine from the target rendering platform by bridging Node.js and Flutter via WebSockets.
 
-## Getting Started
+## Architecture
 
-This project is a starting point for a Flutter application.
+The system is split into two distinct processes communicating over an IPC boundary (WebSockets):
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```text
+Node.js Process              Target Process (Flutter)
++-------------------+        +-------------------+
+| React Components  |        | Platform Runtime  |
+|       |           |        |                   |
+|  reconciler       |  IPC   |  Widget Registry  |
+|       |           | (JSON) |       |           |
+|  hostConfig  -----+------->|  Create/Update/   |
+|       |           |        |  Remove widgets   |
+|  Yoga layout      |        |       |           |
+|  Layout msgs -----+------->|  Render to screen |
++-------------------+        +-------------------+
